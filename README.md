@@ -24,5 +24,5 @@ Before you begin, ensure you have the following installed on your machine:
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/yourusername/MahooNoNeko.git](https://github.com/yourusername/MahooNoNeko.git)
+   https://github.com/ZekqKeku/MahooNoNeko.git
    cd MahooNoNeko
