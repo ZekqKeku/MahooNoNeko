@@ -1,3 +1,4 @@
 yt-dlp
 nanoid
 nextcord
+requests
