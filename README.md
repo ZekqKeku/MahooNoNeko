@@ -15,7 +15,7 @@ Links are provided to the user, and the bot automatically cleans up the hosted f
 ## 🛠️ Prerequisites
 
 Before you begin, ensure you have the following installed on your machine:
-* **Python 3.9+**
+* **Python 3.14+**
 * **FFmpeg**: Required by `yt-dlp` for extracting audio and merging video/audio tracks.
 * **Discord Bot Token**: You can get this from the Discord Developer Portal.
 * **Pixeldrain API Key**: Required for uploading files to Pixeldrain.
