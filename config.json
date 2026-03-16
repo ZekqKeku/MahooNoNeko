@@ -1,0 +1,15 @@
+{
+  "bot": {
+    "token": ""
+  },
+  "discord": {
+    "super_users": [
+      ""
+    ]
+  },
+  "api": {
+    "pixeldrain": {
+      "key": ""
+    }
+  }
+}
