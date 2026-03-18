@@ -1,4 +1,5 @@
 import time
+import asyncio
 from nextcord.ext import commands, tasks
 from utilities import baseUtils, uploader, botDatabase
 
@@ -18,7 +19,7 @@ class ClearEvent(commands.Cog):
             self.clear_expired_files.start()
 
     def cog_unload(self):
-        if self.config.get_pixeldrain_auto_clear():
+        if self.clear_expired_files.is_running():
             self.clear_expired_files.cancel()
 
     @tasks.loop(hours=6)
@@ -32,14 +33,21 @@ class ClearEvent(commands.Cog):
 
         for db_id, pixeldrain_id in expired_files.items():
             try:
-                self.pixeldrain.delete_file(pixeldrain_id)
-                self.database.move_to_archive(db_id)
+                success = await asyncio.to_thread(self.pixeldrain.delete_file, pixeldrain_id)
 
-                print(f"[ClearEvent] Deleted and archived: {pixeldrain_id} (DB ID: {db_id})")
+                if success:
+                    self.database.move_to_archive(db_id)
+                    print(f"[ClearEvent] Deleted and archived: {pixeldrain_id} (DB ID: {db_id})")
+                else:
+                    print(f"[ClearEvent] Failed to delete {pixeldrain_id} from Pixeldrain. Kept in main DB.")
 
             except Exception as e:
-                print(f"[ClearEvent] Error while deleting {pixeldrain_id}: {e}")
+                print(f"[ClearEvent] Error while processing {pixeldrain_id}: {e}")
 
     @clear_expired_files.before_loop
     async def before_clear_expired_files(self):
         await self.client.wait_until_ready()
+
+
+def setup(client, config, pixeldrain, database):
+    client.add_cog(ClearEvent(client, config, pixeldrain, database))
