@@ -34,7 +34,8 @@ class BotDatabase:
             ''')
             conn.commit()
 
-    def add_download(self, download_date,
+    def add_download(self,
+        download_date,
         discord_user_id,
         pixeldrain_upload_id,
         file_name,

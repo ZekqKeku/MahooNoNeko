@@ -1,14 +1,21 @@
 import nextcord
 from nextcord.ext import commands
+from datetime import datetime, timedelta
 
-from utilities import baseUtils, uploader, download
+from utilities import baseUtils, uploader, download, botDatabase
 
 class Downloader(commands.Cog):
-    def __init__(self, client, config: baseUtils.ConfigReader, pixeldrain: uploader.PixeldrainUploader, downloader: download.Download):
+    def __init__(self,
+        client, config: baseUtils.ConfigReader,
+        pixeldrain: uploader.PixeldrainUploader,
+        downloader: download.Download,
+        database: botDatabase.BotDatabase
+    ):
         self.client = client
         self.config = config
         self.pixeldrain = pixeldrain
         self.downloader = downloader
+        self.database = database
 
     @nextcord.slash_command(
         name="download_music",
@@ -29,6 +36,17 @@ class Downloader(commands.Cog):
         file_id = self.pixeldrain.upload_file(path)
         file_url = self.pixeldrain.get_download_link(file_id)
         self.downloader.remove_file(path)
+
+        now = datetime.now()
+        deletion_time = now + timedelta(days=self.config.get_pixeldrain_delete_after())
+        self.database.add_download(
+            now.strftime('%Y-%m-%d %H:%M:%S'),
+            interaction.user.id,
+            file_id,
+            file_name,
+            now.timestamp(),
+            deletion_time.timestamp()
+        )
 
         content = (
             "Link do pobrania twojego pliku .mp3\n"
@@ -59,6 +77,17 @@ class Downloader(commands.Cog):
         else:
             file_url = self.pixeldrain.get_download_link(file_id)
         self.downloader.remove_file(path)
+
+        now = datetime.now()
+        deletion_time = now + timedelta(days=self.config.get_pixeldrain_delete_after())
+        self.database.add_download(
+            now.strftime('%Y-%m-%d %H:%M:%S'),
+            interaction.user.id,
+            file_id,
+            file_name,
+            now.timestamp(),
+            deletion_time.timestamp()
+        )
 
         content = (
             "Link do pobrania twojego pliku .mp4\n"
