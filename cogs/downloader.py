@@ -3,7 +3,7 @@ from nextcord.ext import commands
 
 from utilities import baseUtils, uploader, download
 
-class StartEventsCog(commands.Cog):
+class Downloader(commands.Cog):
     def __init__(self, client, config: baseUtils.ConfigReader, pixeldrain: uploader.PixeldrainUploader, downloader: download.Download):
         self.client = client
         self.config = config

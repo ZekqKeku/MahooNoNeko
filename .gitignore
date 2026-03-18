@@ -40,6 +40,9 @@ dev_config.json
 /[Dd]ata
 ./[Dd]ata
 ./[Dd]ata/*.db
+/[Dd]ownloads
+./[Dd]ownloads
+./[Dd]ownloads/*.*
 
 # --- Logging ---
 *.log
