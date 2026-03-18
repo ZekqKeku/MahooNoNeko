@@ -41,8 +41,11 @@ class PixeldrainUploader:
             print(f"Pixeldrain upload failed: {data}")
             raise Exception(f"Upload failed: {data}")
 
-    def get_download_link(self, file_id: str) -> str:
+    def get_download_direct_link(self, file_id: str) -> str:
         return f"{self.BASE_URL}/file/{file_id}"
+
+    def get_download_link(self, file_id: str) -> str:
+        return f"https://pixeldrain.com/u/{file_id}"
 
     def get_file_info(self, file_id: str) -> dict:
         print(f"Fetching info for file ID: {file_id}...")
