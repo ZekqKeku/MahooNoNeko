@@ -1,8 +1,8 @@
 import nextcord
 from nextcord.ext import commands
 from datetime import datetime, timedelta
-
 from utilities import baseUtils, uploader, download, botDatabase
+from utilities.cooldowns import CogSharedCooldown, cog_cooldown
 
 class Downloader(commands.Cog):
     def __init__(self,
@@ -17,10 +17,13 @@ class Downloader(commands.Cog):
         self.downloader = downloader
         self.database = database
 
+        self.cooldown_manager = CogSharedCooldown(rate=1, per=60.0)
+
     @nextcord.slash_command(
         name="download_music",
         description="Download a mp3 file",
     )
+    @cog_cooldown(message="**Cooldown!** Next download possible in **&value&s**.")
     async def download_music(self,
         interaction: nextcord.Interaction,
         url: str = nextcord.SlashOption(
@@ -59,6 +62,7 @@ class Downloader(commands.Cog):
         name="download_video",
         description="Download a mp4 file",
     )
+    @cog_cooldown(message="**Cooldown!** Next download possible in **&value&s**.")
     async def download_video(self,
         interaction: nextcord.Interaction,
         url: str = nextcord.SlashOption(
@@ -82,7 +86,7 @@ class Downloader(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         file_name = baseUtils.Utils.random_name()
 
-        self.downloader.download_video(url, file_name, resolution)
+        self.downloader.download_video(url, file_name=file_name, resolution=resolution)
         path = self.downloader.get_path(file_name=file_name, ext="mp4")
         file_id = self.pixeldrain.upload_file(path)
         if self.config.get_pixeldrain_direct_link():

@@ -58,13 +58,17 @@ class Loader:
         self.client = payload.get("client")
         self.folder = folder
 
+        if not os.path.exists(self.folder):
+            print(f"Warning: Folder {self.folder} not found.")
+            return
+
         for filename in os.listdir(self.folder):
             if filename.endswith(".py") and not filename.startswith("__"):
                 module_name = f"{self.folder}.{filename[:-3]}"
+                class_name = "N/A"
 
                 base_name = filename[:-3]
                 pascal_case_name = "".join(word.capitalize() for word in base_name.split("_"))
-
                 cog_class_name = f"{pascal_case_name}Cog"
                 standard_class_name = pascal_case_name
 
@@ -78,13 +82,11 @@ class Loader:
                         class_name = standard_class_name
                         cog_class = getattr(module, standard_class_name)
                     else:
-                        print(
-                            f"\n > Failed to load: {module_name}: Class {cog_class_name} or {standard_class_name} not found.\n")
+                        print(f"\n > Failed to load: {module_name}: Class not found.\n")
                         continue
 
                     sig = inspect.signature(cog_class.__init__)
                     params = list(sig.parameters)[1:]
-
                     args_map = {
                         "client": self.payload.get('client'),
                         "config": self.payload.get('config'),
@@ -92,18 +94,14 @@ class Loader:
                         "downloader": self.payload.get('downloader'),
                         "database": self.payload.get('database')
                     }
-
                     args = [args_map[p] for p in params if p in args_map]
 
                     cog_instance = cog_class(*args)
                     self.client.add_cog(cog_instance)
-
                     print(f"Loaded: {class_name}")
 
-                except (ImportError, TypeError) as e:
-                    print(f"\n > Failed to load: {module_name}.{class_name}: {e}\n")
                 except Exception as e:
-                    print(f"\n > Unexpected error loading {module_name}: {e}\n")
+                    print(f"\n > Failed to load {module_name} ({class_name}): {e}\n")
 
 class Utils:
     @staticmethod
