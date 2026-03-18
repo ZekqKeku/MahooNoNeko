@@ -11,7 +11,7 @@ class BotDatabase:
 
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS downloads (
-                id INTEGER PRIMARY KEY UTOINCREMENT, 
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 download_date TEXT,
                 discord_user_id  INTEGER,
                 pixeldrain_upload_id TEXT,
@@ -23,7 +23,7 @@ class BotDatabase:
 
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS downloads_archive (
-                id INTEGER PRIMARY KEY UTOINCREMENT, 
+                id INTEGER PRIMARY KEY, 
                 download_date TEXT,
                 discord_user_id  INTEGER,
                 pixeldrain_upload_id TEXT,

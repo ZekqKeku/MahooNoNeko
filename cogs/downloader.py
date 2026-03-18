@@ -67,7 +67,7 @@ class Downloader(commands.Cog):
         ),
         resolution: int = nextcord.SlashOption(
             name="resolution",
-            description="Select resolution (!, if the source is 720p and you select 41440p, 720p will be downloaded, above 1080p the cost in points is higher)",
+            description="Resolution (downloads up to source max). >1080p costs extra points.",
             required=False,
             choices={
                 "480p (SD)": 480,
