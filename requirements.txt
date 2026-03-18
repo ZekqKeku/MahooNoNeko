@@ -1,3 +1,4 @@
+certifi
 yt-dlp
 nanoid
 nextcord

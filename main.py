@@ -2,6 +2,7 @@ from utilities import baseUtils
 baseUtils.Requirements()
 
 try:
+    from utilities import uploader, download
     from nextcord.ext import commands
     import nextcord
 except:
@@ -9,6 +10,8 @@ except:
 
 def main():
     config = baseUtils.ConfigReader('config.json')
+    pixeldrain = uploader.PixeldrainUploader(config.get_pixeldrain_api())
+    downloader = download.Download('downloads')
 
     intents = nextcord.Intents.default()
     intents.message_content = True
@@ -21,7 +24,9 @@ def main():
 
     payload = {
         'client': client,
-        'config': config
+        'config': config,
+        'pixeldrain': pixeldrain,
+        'downloader': downloader,
     }
 
     baseUtils.Loader(payload)

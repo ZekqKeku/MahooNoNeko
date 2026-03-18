@@ -2,12 +2,24 @@ import yt_dlp
 import time
 import os
 
-class Downloader:
+class Download:
     def __init__(self, base_path="downloads", default_retries=3, default_delay=2, default_resolution=1080):
         self.base_path = base_path
         self.default_retries = default_retries
         self.default_delay = default_delay
         self.default_resolution = default_resolution
+
+    def get_path(self, sub_path=None, filename=None):
+        path = self.base_path
+        if sub_path:
+            path = os.path.join(path, sub_path)
+
+        if filename:
+            if "." not in filename and "%(ext)s" not in filename:
+                filename = f"{filename}.%(ext)s"
+            return os.path.join(path, filename)
+
+        return path
 
     def _execute_download(self, url, options, retries=None):
         max_retries = retries if retries is not None else self.default_retries
@@ -103,12 +115,3 @@ class Downloader:
         }
         opts = self._build_options(base_opts, filename, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
-
-if __name__ == "__main__":
-    from nanoid import generate
-    alphabet = "qwertyuiopasdfghjklzxcvbnm"
-    name = "-".join([generate(size=4, alphabet=alphabet) for _ in range(5)])
-    print(f"> Target name: {name}")
-    test_url = "https://www.youtube.com/watch?v=_wZfYtYwxro"
-    downloader = Downloader(default_retries=1)
-    downloader.download_audio(test_url, filename=name)

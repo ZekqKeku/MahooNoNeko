@@ -78,7 +78,9 @@ class Loader:
 
                     args_map = {
                         "client": self.payload.get('client'),
-                        "config": self.payload.get('config')
+                        "config": self.payload.get('config'),
+                        "pixeldrain": self.payload.get('pixeldrain'),
+                        "downloader": self.payload.get('downloader')
                     }
 
                     args = [args_map[p] for p in params if p in args_map]
