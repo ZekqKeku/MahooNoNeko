@@ -9,15 +9,15 @@ class Download:
         self.default_delay = default_delay
         self.default_resolution = default_resolution
 
-    def get_path(self, sub_path=None, filename=None):
+    def get_path(self, sub_path=None, file_name=None):
         path = self.base_path
         if sub_path:
             path = os.path.join(path, sub_path)
 
-        if filename:
-            if "." not in filename and "%(ext)s" not in filename:
-                filename = f"{filename}.%(ext)s"
-            return os.path.join(path, filename)
+        if file_name:
+            if "." not in file_name and "%(ext)s" not in file_name:
+                file_name = f"{file_name}.%(ext)s"
+            return os.path.join(path, file_name)
 
         return path
 
@@ -46,7 +46,7 @@ class Download:
                 options['nocache'] = True
                 time.sleep(self.default_delay)
 
-    def _build_options(self, base_options, filename=None, sub_path=None, **kwargs):
+    def _build_options(self, base_options, file_name=None, sub_path=None, **kwargs):
         opts = base_options.copy()
 
         if sub_path:
@@ -54,10 +54,10 @@ class Download:
         else:
             full_dir = self.base_path
 
-        if filename:
-            if "." not in filename and "%(ext)s" not in filename:
-                filename = f"{filename}.%(ext)s"
-            final_name = filename
+        if file_name:
+            if "." not in file_name and "%(ext)s" not in file_name:
+                file_name = f"{file_name}.%(ext)s"
+            final_name = file_name
         else:
             final_name = '%(title)s.%(ext)s'
 
@@ -66,7 +66,7 @@ class Download:
         opts.update(kwargs)
         return opts
 
-    def download_audio(self, url, filename=None, sub_path=None, retries=None, **kwargs):
+    def download_audio(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
@@ -76,10 +76,10 @@ class Download:
             }],
             'noplaylist': True,
         }
-        opts = self._build_options(base_opts, filename, sub_path, **kwargs)
+        opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
 
-    def download_video(self, url, filename=None, sub_path=None, resolution=None, retries=None, **kwargs):
+    def download_video(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
         res = resolution if resolution else self.default_resolution
         format_str = f'bestvideo[height<={res}]+bestaudio/best[height<={res}]/best'
 
@@ -87,18 +87,18 @@ class Download:
             'format': format_str,
             'merge_output_format': kwargs.pop('ext', 'mp4'),
         }
-        opts = self._build_options(base_opts, filename, sub_path, **kwargs)
+        opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
 
-    def download_thumbnail(self, url, filename=None, sub_path=None, retries=None, **kwargs):
+    def download_thumbnail(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'skip_download': True,
             'writethumbnail': True,
         }
-        opts = self._build_options(base_opts, filename, sub_path, **kwargs)
+        opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
 
-    def download_social_media(self, url, filename=None, sub_path=None, resolution=None, retries=None, **kwargs):
+    def download_social_media(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
         res = resolution if resolution else self.default_resolution
         format_str = f'best[height<={res}]/bestvideo[height<={res}]+bestaudio/best'
 
@@ -106,12 +106,12 @@ class Download:
             'format': format_str,
             'extractor_args': {'tiktok': {'api_hostname': 'api16-normal-c-useast1a.tiktokv.com'}},
         }
-        opts = self._build_options(base_opts, filename, sub_path, **kwargs)
+        opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
 
-    def download_generic(self, url, filename=None, sub_path=None, retries=None, **kwargs):
+    def download_generic(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'format': 'bestvideo+bestaudio/best',
         }
-        opts = self._build_options(base_opts, filename, sub_path, **kwargs)
+        opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)

@@ -34,5 +34,5 @@ class Downloader(commands.Cog):
             f"{file_url}"
         )
 
-        await interaction.followup.send(content=content)
+        await interaction.followup.send(content=content, ephemeral=True)
 
