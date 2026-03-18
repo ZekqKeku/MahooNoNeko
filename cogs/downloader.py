@@ -64,7 +64,20 @@ class Downloader(commands.Cog):
         url: str = nextcord.SlashOption(
             name = "url",
             description = "The URL to the youtube video, instagram reels, etc.",
+        ),
+        resolution: int = nextcord.SlashOption(
+            name="resolution",
+            description="Select resolution (!, if the source is 720p and you select 41440p, 720p will be downloaded, above 1080p the cost in points is higher)",
+            required=False,
+            choices={
+                "480p (SD)": 480,
+                "720p (HD)": 720,
+                "1080p (Full HD)": 1080,
+                "1440p (2K)": 1440,
+                "2160p (4K)": 2160
+            }
         )
+
     ):
         await interaction.response.defer(ephemeral=True)
         file_name = baseUtils.Utils.random_name()
