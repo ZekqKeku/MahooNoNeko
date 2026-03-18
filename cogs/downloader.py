@@ -82,7 +82,7 @@ class Downloader(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         file_name = baseUtils.Utils.random_name()
 
-        self.downloader.download_video(url, file_name)
+        self.downloader.download_video(url, file_name, resolution)
         path = self.downloader.get_path(file_name=file_name, ext="mp4")
         file_id = self.pixeldrain.upload_file(path)
         if self.config.get_pixeldrain_direct_link():

@@ -85,6 +85,18 @@ class Download:
         return self._execute_download(url, opts, retries)
 
     def download_video(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
+        social_media_domains = ['tiktok.com', 'instagram.com']
+
+        if any(domain in url for domain in social_media_domains):
+            return self.download_social_media(
+                url,
+                file_name=file_name,
+                sub_path=sub_path,
+                resolution=resolution,
+                retries=retries,
+                **kwargs
+            )
+
         res = resolution if resolution else self.default_resolution
         format_str = f'bestvideo[height<={res}]+bestaudio/best[height<={res}]/best'
 
@@ -109,8 +121,18 @@ class Download:
 
         base_opts = {
             'format': format_str,
-            'extractor_args': {'tiktok': {'api_hostname': 'api16-normal-c-useast1a.tiktokv.com'}},
+            'extractor_args': {},
         }
+
+        if 'tiktok.com' in url:
+            base_opts['extractor_args']['tiktok'] = {'api_hostname': 'api16-normal-c-useast1a.tiktokv.com'}
+
+        elif 'instagram.com' in url:
+            base_opts['http_headers'] = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+            base_opts['playlist_items'] = '1'
+
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
 
