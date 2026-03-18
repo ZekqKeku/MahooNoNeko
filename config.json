@@ -9,7 +9,10 @@
   },
   "api": {
     "pixeldrain": {
-      "key": ""
+      "key": "",
+      "direct_link": false,
+      "auto_clear": true,
+      "delete_after": 3
     }
   }
 }

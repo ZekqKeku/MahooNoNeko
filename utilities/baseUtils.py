@@ -43,6 +43,15 @@ class ConfigReader:
     def get_pixeldrain_api(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("key", "")
 
+    def get_pixeldrain_direct_link(self):
+        return self.config_data.get("api", {}).get("pixeldrain", {}).get("direct_link", "")
+
+    def get_pixeldrain_auto_clear(self):
+        return self.config_data.get("api", {}).get("pixeldrain", {}).get("auto_clear", "")
+
+    def get_pixeldrain_delete_after(self):
+        return self.config_data.get("api", {}).get("pixeldrain", {}).get("delete_after", "")
+
 class Loader:
     def __init__(self, payload: dict[str, any], folder="cogs"):
         self.payload = payload
