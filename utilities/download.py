@@ -9,15 +9,20 @@ class Download:
         self.default_delay = default_delay
         self.default_resolution = default_resolution
 
-    def get_path(self, sub_path=None, file_name=None):
+    def get_path(self, sub_path=None, file_name=None, ext=None):
         path = self.base_path
         if sub_path:
             path = os.path.join(path, sub_path)
 
         if file_name:
-            if "." not in file_name and "%(ext)s" not in file_name:
-                file_name = f"{file_name}.%(ext)s"
-            return os.path.join(path, file_name)
+            if ext:
+                full_file_name = f"{file_name}.{ext}"
+            elif "." not in file_name and "%(ext)s" not in file_name:
+                full_file_name = f"{file_name}.%(ext)s"
+            else:
+                full_file_name = file_name
+
+            return os.path.join(path, full_file_name)
 
         return path
 
@@ -115,3 +120,16 @@ class Download:
         }
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
         return self._execute_download(url, opts, retries)
+
+    def remove_file(self, file_path):
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Successfully removed file: {file_path}")
+                return True
+            else:
+                print(f"File not found, could not remove: {file_path}")
+                return False
+        except Exception as e:
+            print(f"Error removing file: {e}")
+            return False

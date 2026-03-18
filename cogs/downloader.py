@@ -21,16 +21,17 @@ class Downloader(commands.Cog):
             description = "The URL to the youtube video, instagram reels, etc.",
         )
     ):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         file_name = baseUtils.Utils.random_name()
 
         self.downloader.download_audio(url, file_name)
-        path = self.downloader.get_path(file_name=file_name)
+        path = self.downloader.get_path(file_name=file_name, ext="mp3")
         file_id = self.pixeldrain.upload_file(path)
         file_url = self.pixeldrain.get_download_link(file_id)
+        self.downloader.remove_file(path)
 
         content = (
-            "Link do pobrania twojego pliku .mp3"
+            "Link do pobrania twojego pliku .mp3\n"
             f"{file_url}"
         )
 
