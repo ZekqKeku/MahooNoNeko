@@ -2,9 +2,10 @@ from utilities import baseUtils
 baseUtils.Requirements()
 
 try:
-    from utilities import uploader, download
+    from utilities import uploader, download, botDatabase
     from nextcord.ext import commands
     import nextcord
+    import os
 except:
     raise RuntimeError('\n > Failed to load libraries!\n')
 
@@ -12,6 +13,8 @@ def main():
     config = baseUtils.ConfigReader('config.json')
     pixeldrain = uploader.PixeldrainUploader(config.get_pixeldrain_api())
     downloader = download.Download('downloads')
+    data_dir = '/data' if os.path.exists('/.dockerenv') else './data'
+    database = botDatabase.BotDatabase(data_dir, 'MahooNoNeko.db')
 
     intents = nextcord.Intents.default()
     intents.message_content = True
@@ -27,6 +30,7 @@ def main():
         'config': config,
         'pixeldrain': pixeldrain,
         'downloader': downloader,
+        'database': database
     }
 
     baseUtils.Loader(payload)

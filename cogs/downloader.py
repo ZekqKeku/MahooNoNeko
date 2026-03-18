@@ -54,7 +54,10 @@ class Downloader(commands.Cog):
         self.downloader.download_video(url, file_name)
         path = self.downloader.get_path(file_name=file_name, ext="mp4")
         file_id = self.pixeldrain.upload_file(path)
-        file_url = self.pixeldrain.get_download_link(file_id)
+        if self.config.get_pixeldrain_direct_link():
+            file_url = self.pixeldrain.get_download_direct_link(file_id)
+        else:
+            file_url = self.pixeldrain.get_download_link(file_id)
         self.downloader.remove_file(path)
 
         content = (
