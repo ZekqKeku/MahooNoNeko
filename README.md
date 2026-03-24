@@ -13,6 +13,17 @@ Links are provided to the user, and the bot automatically cleans up the hosted f
 * **Modern Async Framework**: Built on top of `nextcord` for fast and asynchronous Discord API interactions.
 * **Cooldown & Quota Management**: Built-in rate limits to prevent spamming. Super users defined in the config can bypass these restrictions.
 
+## 🪙 Token System (Quota)
+
+To prevent abuse and manage server resources, the bot implements a daily token-based quota system for users. Each user receives a daily allowance of tokens (defined by `default_token_limit`), which resets every day at midnight. 
+
+The cost of each download is calculated dynamically before the download begins:
+* **Base cost**: 10 points per operation
+* **Duration**: 2 points per every minute of the media
+* **Quality/Format multiplier**: Additional points are added for higher resolutions (e.g., 1440p costs +100 points, 4K costs +150 points) or lossless audio formats.
+
+If an operation exceeds the user's remaining daily tokens, the download request will be rejected.
+
 ## 🛠️ Prerequisites
 
 Before you begin, ensure you have the following installed on your machine:
@@ -51,7 +62,8 @@ Edit the config.json file in the root directory with your credentials:
           "direct_link": false,
           "delete_after": 3,
           "max_file_size": 2,
-          "max_file_length": 5400
+          "max_file_length": 5400,
+          "default_token_limit": 350
         }
       }
     }
@@ -61,6 +73,7 @@ Edit the config.json file in the root directory with your credentials:
    - **delete_after** - informs the Pixeldrain API after how many days to delete the file; please note that on the free plan, Pixeldrain automatically deletes files after 60 days of inactivity (when they are not viewed or downloaded)
    - **max_file_size** - gigabajty, gigabytes, the maximum size of the file the user wants to download; Pixeldrain's free plan allows a max of 10
    - **max_file_length** - seconds, the maximum length of the downloaded media
+   - **default_token_limit** - the daily pool of points (tokens) assigned to each regular user for downloading media.
 
 _(Note: The configuration file structure is subject to significant changes. Also, please keep in mind that during development, some options might not yet affect the bot's operation)_
 

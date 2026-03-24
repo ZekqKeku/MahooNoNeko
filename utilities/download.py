@@ -25,27 +25,14 @@ class Download:
             'flac': 50
         }
 
-    def is_live_stream(self, url: str) -> bool:
-        options = {
-            'noplaylist': True,
-            'quiet': True,
-            'skip_download': True
-        }
-
-        try:
-            with yt_dlp.YoutubeDL(options) as ydl:
-                info_dict = ydl.extract_info(url, download=False)
-                return info_dict.get('is_live', False) is True
-        except Exception as e:
-            print(f"Error checking live stream status: {e}")
-            return False
-
-    def calculate_quota(self,
+    def verify_media(self,
         url: str,
+        max_length: int,
+        max_size_gb: float,
         resolution: int = None,
         audio_format: str = 'mp3',
         is_audio: bool = False
-    ) -> int:
+    ) -> dict:
         base_cost = 10
         multiplier_per_minute = 2
 
@@ -64,14 +51,33 @@ class Download:
         try:
             with yt_dlp.YoutubeDL(options) as ydl:
                 info_dict = ydl.extract_info(url, download=False)
+
+                if info_dict.get('is_live', False):
+                    return {"success": False, "error": "live_stream"}
+
                 duration_sec = info_dict.get('duration') or 0
+                filesize = info_dict.get('filesize') or info_dict.get('filesize_approx') or 0
+
         except Exception as e:
-            print(f"Error calculating quota: {e}")
-            return 0
+            print(f"Error checking media: {e}")
+            return {"success": False, "error": "fetch_error"}
+
+        if duration_sec > max_length:
+            return {"success": False, "error": "too_long", "duration": duration_sec, "max_length": max_length}
+
+        max_size_bytes = max_size_gb * 1024 * 1024 * 1024
+        if filesize > max_size_bytes:
+            estimated_gb = round(filesize / (1024**3), 2)
+            return {"success": False, "error": "too_heavy", "filesize_gb": estimated_gb, "max_size_gb": max_size_gb}
 
         duration_min = math.ceil(duration_sec / 60)
         total_cost = base_cost + (duration_min * multiplier_per_minute) + q_cost
-        return int(total_cost)
+
+        return {
+            "success": True,
+            "cost": int(total_cost),
+            "duration": duration_sec
+        }
 
     def get_path(self, sub_path=None, file_name=None, ext=None):
         path = self.base_path
