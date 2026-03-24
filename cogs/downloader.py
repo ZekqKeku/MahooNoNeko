@@ -17,7 +17,7 @@ class Downloader(commands.Cog):
         self.downloader = downloader
         self.database = database
 
-        self.token_limit = 350
+        self.token_limit = self.config.get_default_token_limit()
 
         self.cooldown_manager = CogSharedCooldown(rate=1, per=60.0)
 

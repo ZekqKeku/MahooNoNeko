@@ -55,6 +55,9 @@ class ConfigReader:
     def get_pixeldrain_max_file_length(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("max_file_length", "")
 
+    def get_default_token_limit(self):
+        return self.config_data.get("api", {}).get("pixeldrain", {}).get("default_token_limit", "")
+
 class Loader:
     def __init__(self, payload: dict[str, any], folder="cogs"):
         self.payload = payload
