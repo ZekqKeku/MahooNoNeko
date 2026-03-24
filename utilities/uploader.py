@@ -54,16 +54,13 @@ class PixeldrainUploader:
         response.raise_for_status()
         return response.json()
 
-    def delete_file(self, file_id: str) -> bool:
-        print(f"Deleting file from Pixeldrain (ID: {file_id})...")
-        url = f"{self.BASE_URL}/file/{file_id}"
-        response = requests.delete(url, auth=self.auth)
-        response.raise_for_status()
-
-        data = response.json()
-        success = data.get("success", False)
-        if success:
-            print(f"File {file_id} deleted successfully from Pixeldrain.")
-        else:
-            print(f"Failed to delete file {file_id} from Pixeldrain.")
-        return success
+    def check_file_exists(self, file_id: str) -> bool:
+        try:
+            url = f"{self.BASE_URL}/file/{file_id}/info"
+            response = requests.get(url, auth=self.auth)
+            if response.status_code == 404:
+                return False
+            response.raise_for_status()
+            return True
+        except requests.RequestException:
+            return False

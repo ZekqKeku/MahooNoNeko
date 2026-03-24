@@ -27,20 +27,12 @@ class ConfigReader:
         self.file_path = file_path
         self.config_data = self._load_config()
 
-        if self._check_clear_conflict():
-            raise ValueError("Cannot enable both database and Pixeldrain API clearing at once.")
-
     def _load_config(self):
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"Config file not found: {self.file_path}")
 
         with open(self.file_path, "r", encoding="utf-8") as file:
             return json.load(file)
-
-    def _check_clear_conflict(self):
-        database_method = self.config_data.get("api", {}).get("pixeldrain", {}).get("auto_clear", "")
-        api_method = self.config_data.get("api", {}).get("pixeldrain", {}).get("auto_clear_by_api", "")
-        return database_method and api_method
 
     def get_bot_token(self):
         return self.config_data.get("bot", {}).get("token", "")
@@ -53,12 +45,6 @@ class ConfigReader:
 
     def get_pixeldrain_direct_link(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("direct_link", "")
-
-    def get_pixeldrain_auto_clear(self):
-        return self.config_data.get("api", {}).get("pixeldrain", {}).get("auto_clear", "")
-
-    def get_pixeldrain_auto_clear_by_api(self):
-        return self.config_data.get("api", {}).get("pixeldrain", {}).get("auto_clear_by_api", "")
 
     def get_pixeldrain_delete_after(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("delete_after", "")

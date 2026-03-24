@@ -15,15 +15,14 @@ class ClearEvent(commands.Cog):
         self.pixeldrain = pixeldrain
         self.database = database
 
-        if self.config.get_pixeldrain_auto_clear():
-            self.clear_expired_files.start()
+        self.monitor_expired_files.start()
 
     def cog_unload(self):
-        if self.clear_expired_files.is_running():
-            self.clear_expired_files.cancel()
+        if self.monitor_expired_files.is_running():
+            self.monitor_expired_files.cancel()
 
     @tasks.loop(hours=6)
-    async def clear_expired_files(self):
+    async def monitor_expired_files(self):
         current_timestamp = time.time()
 
         expired_files = self.database.get_expired_downloads(current_timestamp)
@@ -33,21 +32,20 @@ class ClearEvent(commands.Cog):
 
         for db_id, pixeldrain_id in expired_files.items():
             try:
-                success = await asyncio.to_thread(self.pixeldrain.delete_file, pixeldrain_id)
+                file_exists = await asyncio.to_thread(self.pixeldrain.check_file_exists, pixeldrain_id)
 
-                if success:
+                if not file_exists:
                     self.database.move_to_archive(db_id)
-                    print(f"[ClearEvent] Deleted and archived: {pixeldrain_id} (DB ID: {db_id})")
+                    print(f"[ClearEvent] File {pixeldrain_id} is no longer on Pixeldrain. Archived (DB ID: {db_id})")
                 else:
-                    print(f"[ClearEvent] Failed to delete {pixeldrain_id} from Pixeldrain. Kept in main DB.")
+                    print(f"[ClearEvent] {pixeldrain_id} still exists on API side. Waiting for Pixeldrain to clean it.")
 
             except Exception as e:
                 print(f"[ClearEvent] Error while processing {pixeldrain_id}: {e}")
 
-    @clear_expired_files.before_loop
-    async def before_clear_expired_files(self):
+    @monitor_expired_files.before_loop
+    async def before_monitor_expired_files(self):
         await self.client.wait_until_ready()
-
 
 def setup(client, config, pixeldrain, database):
     client.add_cog(ClearEvent(client, config, pixeldrain, database))

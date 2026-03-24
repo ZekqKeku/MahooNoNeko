@@ -13,9 +13,11 @@ class BotDatabase:
             CREATE TABLE IF NOT EXISTS downloads (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 download_date TEXT,
-                discord_user_id  INTEGER,
+                discord_user_id INTEGER,
                 pixeldrain_upload_id TEXT,
                 file_name TEXT,
+                file_extension TEXT,
+                file_length REAL,
                 downloaded_timestamp REAL,
                 scheduled_deletion_timestamp REAL
             )
@@ -25,9 +27,11 @@ class BotDatabase:
             CREATE TABLE IF NOT EXISTS downloads_archive (
                 id INTEGER PRIMARY KEY, 
                 download_date TEXT,
-                discord_user_id  INTEGER,
+                discord_user_id INTEGER,
                 pixeldrain_upload_id TEXT,
                 file_name TEXT,
+                file_extension TEXT,
+                file_length REAL,
                 downloaded_timestamp REAL,
                 scheduled_deletion_timestamp REAL
             )
@@ -39,6 +43,8 @@ class BotDatabase:
         discord_user_id,
         pixeldrain_upload_id,
         file_name,
+        file_extension,
+        file_length,
         downloaded_timestamp,
         scheduled_deletion_timestamp
     ):
@@ -50,14 +56,18 @@ class BotDatabase:
                     discord_user_id, 
                     pixeldrain_upload_id,
                     file_name,
+                    file_extension,
+                    file_length,
                     downloaded_timestamp, 
                     scheduled_deletion_timestamp)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                 download_date,
                 discord_user_id,
                 pixeldrain_upload_id,
                 file_name,
+                file_extension,
+                file_length,
                 downloaded_timestamp,
                 scheduled_deletion_timestamp))
             conn.commit()

@@ -33,12 +33,12 @@ class Download:
         while attempt < max_retries:
             try:
                 with yt_dlp.YoutubeDL(options) as ydl:
-                    error_code = ydl.download([url])
-                    if error_code == 0:
-                        print(f"Successfully downloaded: {url}")
-                        return True
-                    else:
-                        raise Exception(f"yt-dlp returned error code: {error_code}")
+                    info_dict = ydl.extract_info(url, download=True)
+                    print(f"Successfully downloaded: {url}")
+                    return {
+                        'success': True,
+                        'duration': info_dict.get('duration', 0) if info_dict else 0
+                    }
 
             except Exception as e:
                 attempt += 1
@@ -46,7 +46,7 @@ class Download:
 
                 if attempt >= max_retries:
                     print("Reached maximum retries. Aborting download.")
-                    return False
+                    return {'success': False, 'duration': 0}
 
                 options['nocache'] = True
                 time.sleep(self.default_delay)
