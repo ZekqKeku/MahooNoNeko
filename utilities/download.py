@@ -1,6 +1,7 @@
 import yt_dlp
 import time
 import os
+import math
 
 class Download:
     def __init__(self, base_path="downloads", default_retries=3, default_delay=2, default_resolution=1080):
@@ -8,6 +9,69 @@ class Download:
         self.default_retries = default_retries
         self.default_delay = default_delay
         self.default_resolution = default_resolution
+
+        self._quality_costs = {
+            480: 0,
+            720: 0,
+            1080: 0,
+            1440: 100,
+            2160: 150
+        }
+
+        self._audio_costs = {
+            'mp3': 0,
+            'm4a': 0,
+            'wav': 50,
+            'flac': 50
+        }
+
+    def is_live_stream(self, url: str) -> bool:
+        options = {
+            'noplaylist': True,
+            'quiet': True,
+            'skip_download': True
+        }
+
+        try:
+            with yt_dlp.YoutubeDL(options) as ydl:
+                info_dict = ydl.extract_info(url, download=False)
+                return info_dict.get('is_live', False) is True
+        except Exception as e:
+            print(f"Error checking live stream status: {e}")
+            return False
+
+    def calculate_quota(self,
+        url: str,
+        resolution: int = None,
+        audio_format: str = 'mp3',
+        is_audio: bool = False
+    ) -> int:
+        base_cost = 10
+        multiplier_per_minute = 2
+
+        q_cost = 0
+        if is_audio:
+            q_cost = self._audio_costs.get(audio_format.lower(), 0)
+        elif resolution is not None:
+            q_cost = self._quality_costs.get(resolution, 0)
+
+        options = {
+            'noplaylist': True,
+            'quiet': True,
+            'skip_download': True
+        }
+
+        try:
+            with yt_dlp.YoutubeDL(options) as ydl:
+                info_dict = ydl.extract_info(url, download=False)
+                duration_sec = info_dict.get('duration') or 0
+        except Exception as e:
+            print(f"Error calculating quota: {e}")
+            return 0
+
+        duration_min = math.ceil(duration_sec / 60)
+        total_cost = base_cost + (duration_min * multiplier_per_minute) + q_cost
+        return int(total_cost)
 
     def get_path(self, sub_path=None, file_name=None, ext=None):
         path = self.base_path
