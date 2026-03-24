@@ -50,6 +50,17 @@ class BotDatabase:
 
             conn.commit()
 
+    def _get_latest_custom_limit(self, cursor, user_id: int):
+        cursor.execute('''
+            SELECT custom_limit
+            FROM tokens
+            WHERE user_id = ?
+             AND custom_limit IS NOT NULL
+            ORDER BY date DESC LIMIT 1
+            ''', (user_id,))
+        row = cursor.fetchone()
+        return row[0] if row else None
+
     def add_download(self,
         download_date,
         discord_user_id,
