@@ -56,7 +56,7 @@ class Downloader(commands.Cog):
         max_length = self.config.get_pixeldrain_max_file_length()
         max_size_gb = self.config.get_pixeldrain_max_file_size()
 
-        media_info = self.downloader.verify_media(
+        media_info = await self.downloader.verify_media(
             url=url,
             max_length=max_length,
             max_size_gb=max_size_gb,
@@ -90,7 +90,7 @@ class Downloader(commands.Cog):
         duration = media_info.get("duration", 0)
 
         path = self.downloader.get_path(file_name=file_name, ext=ext)
-        file_id = self.pixeldrain.upload_file(path)
+        file_id = await self.pixeldrain.upload_file(path)
         file_url = self.pixeldrain.get_download_link(file_id)
         self.downloader.remove_file(path)
 
@@ -177,7 +177,7 @@ class Downloader(commands.Cog):
         duration = media_info.get("duration", 0)
 
         path = self.downloader.get_path(file_name=file_name, ext=ext)
-        file_id = self.pixeldrain.upload_file(path)
+        file_id = await self.pixeldrain.upload_file(path)
         if self.config.get_pixeldrain_direct_link():
             file_url = self.pixeldrain.get_download_direct_link(file_id)
         else:

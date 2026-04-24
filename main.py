@@ -1,5 +1,4 @@
 from utilities import baseUtils
-baseUtils.Requirements()
 
 try:
     from utilities import uploader, download, botDatabase

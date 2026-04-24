@@ -2,6 +2,7 @@ import yt_dlp
 import time
 import os
 import math
+import asyncio
 
 class Download:
     def __init__(self, base_path="downloads", default_retries=3, default_delay=2, default_resolution=1080):
@@ -25,7 +26,7 @@ class Download:
             'flac': 50
         }
 
-    def verify_media(self,
+    async def verify_media(self,
         url: str,
         max_length: int,
         max_size_gb: float,
@@ -48,15 +49,17 @@ class Download:
             'skip_download': True
         }
 
-        try:
+        def _verify():
             with yt_dlp.YoutubeDL(options) as ydl:
-                info_dict = ydl.extract_info(url, download=False)
+                return ydl.extract_info(url, download=False)
 
-                if info_dict.get('is_live', False):
-                    return {"success": False, "error": "live_stream"}
+        try:
+            info_dict = await asyncio.to_thread(_verify)
+            if info_dict.get('is_live', False):
+                return {"success": False, "error": "live_stream"}
 
-                duration_sec = info_dict.get('duration') or 0
-                filesize = info_dict.get('filesize') or info_dict.get('filesize_approx') or 0
+            duration_sec = info_dict.get('duration') or 0
+            filesize = info_dict.get('filesize') or info_dict.get('filesize_approx') or 0
 
         except Exception as e:
             print(f"Error checking media: {e}")
@@ -96,19 +99,22 @@ class Download:
 
         return path
 
-    def _execute_download(self, url, options, retries=None):
+    async def _execute_download(self, url, options, retries=None):
         max_retries = retries if retries is not None else self.default_retries
         attempt = 0
 
         while attempt < max_retries:
             try:
-                with yt_dlp.YoutubeDL(options) as ydl:
-                    info_dict = ydl.extract_info(url, download=True)
-                    print(f"Successfully downloaded: {url}")
-                    return {
-                        'success': True,
-                        'duration': info_dict.get('duration', 0) if info_dict else 0
-                    }
+                def _dl():
+                    with yt_dlp.YoutubeDL(options) as ydl:
+                        return ydl.extract_info(url, download=True)
+
+                info_dict = await asyncio.to_thread(_dl)
+                print(f"Successfully downloaded: {url}")
+                return {
+                    'success': True,
+                    'duration': info_dict.get('duration', 0) if info_dict else 0
+                }
 
             except Exception as e:
                 attempt += 1
@@ -119,7 +125,7 @@ class Download:
                     return {'success': False, 'duration': 0}
 
                 options['nocache'] = True
-                time.sleep(self.default_delay)
+                await asyncio.sleep(self.default_delay)
 
     def _build_options(self, base_options, file_name=None, sub_path=None, **kwargs):
         opts = base_options.copy()
@@ -141,7 +147,7 @@ class Download:
         opts.update(kwargs)
         return opts
 
-    def download_audio(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
+    async def download_audio(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
@@ -152,13 +158,13 @@ class Download:
             'noplaylist': True,
         }
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
-        return self._execute_download(url, opts, retries)
+        return await self._execute_download(url, opts, retries)
 
-    def download_video(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
+    async def download_video(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
         social_media_domains = ['tiktok.com', 'instagram.com']
 
         if any(domain in url for domain in social_media_domains):
-            return self.download_social_media(
+            return await self.download_social_media(
                 url,
                 file_name=file_name,
                 sub_path=sub_path,
@@ -175,17 +181,17 @@ class Download:
             'merge_output_format': kwargs.pop('ext', 'mp4'),
         }
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
-        return self._execute_download(url, opts, retries)
+        return await self._execute_download(url, opts, retries)
 
-    def download_thumbnail(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
+    async def download_thumbnail(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'skip_download': True,
             'writethumbnail': True,
         }
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
-        return self._execute_download(url, opts, retries)
+        return await self._execute_download(url, opts, retries)
 
-    def download_social_media(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
+    async def download_social_media(self, url, file_name=None, sub_path=None, resolution=None, retries=None, **kwargs):
         res = resolution if resolution else self.default_resolution
         format_str = f'best[height<={res}]/bestvideo[height<={res}]+bestaudio/best'
 
@@ -204,14 +210,14 @@ class Download:
             base_opts['playlist_items'] = '1'
 
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
-        return self._execute_download(url, opts, retries)
+        return await self._execute_download(url, opts, retries)
 
-    def download_generic(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
+    async def download_generic(self, url, file_name=None, sub_path=None, retries=None, **kwargs):
         base_opts = {
             'format': 'bestvideo+bestaudio/best',
         }
         opts = self._build_options(base_opts, file_name, sub_path, **kwargs)
-        return self._execute_download(url, opts, retries)
+        return await self._execute_download(url, opts, retries)
 
     def remove_file(self, file_path):
         try:

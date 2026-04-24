@@ -1,5 +1,5 @@
-certifi
-yt-dlp
-nanoid
-nextcord
-requests
+certifi==2024.2.2
+yt-dlp==2024.4.9
+nanoid==2.0.0
+nextcord==2.6.0
+requests==2.31.0

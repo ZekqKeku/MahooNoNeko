@@ -13,4 +13,5 @@ class StartEventsCog(commands.Cog):
         print(f" > Bot name: {self.client.user.name}")
         print(f" > Bot id: {self.client.user.id}")
         print(f" > https://discord.com/oauth2/authorize?client_id={self.client.user.id}&permissions=8&scope=bot")
-        print(f" > Pixeldrain API status: {bool(self.pixeldrain)}")
+        status = await self.pixeldrain.check_connection()
+        print(f" > Pixeldrain API status: {status}")

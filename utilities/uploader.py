@@ -1,5 +1,6 @@
 import os
 import requests
+import asyncio
 
 class PixeldrainUploader:
     BASE_URL = "https://pixeldrain.com/api"
@@ -8,18 +9,22 @@ class PixeldrainUploader:
         self.api_key = api_key
         self.auth = ('', self.api_key)
 
-    def __bool__(self) -> bool:
+    async def check_connection(self) -> bool:
         try:
             print("Checking Pixeldrain API connection...")
             url = f"{self.BASE_URL}/user"
-            response = requests.get(url, auth=self.auth)
+            
+            def _check():
+                return requests.get(url, auth=self.auth)
+            
+            response = await asyncio.to_thread(_check)
             status = response.status_code == 200
             return status
-        except requests.RequestException as e:
+        except Exception as e:
             print(f"API Connection Error: {e}")
             return False
 
-    def upload_file(self, file_path: str) -> str:
+    async def upload_file(self, file_path: str) -> str:
         if not os.path.exists(file_path):
             print(f"Upload error: File {file_path} not found.")
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -27,9 +32,11 @@ class PixeldrainUploader:
         print(f"Uploading file to Pixeldrain: {file_path}...")
         url = f"{self.BASE_URL}/file"
 
-        with open(file_path, 'rb') as f:
-            response = requests.post(url, auth=self.auth, files={"file": f})
+        def _upload():
+            with open(file_path, 'rb') as f:
+                return requests.post(url, auth=self.auth, files={"file": f})
 
+        response = await asyncio.to_thread(_upload)
         response.raise_for_status()
         data = response.json()
 
