@@ -1,7 +1,5 @@
-from utilities import baseUtils
-
 try:
-    from utilities import uploader, download, botDatabase
+    from utilities import baseUtils, uploader, download, botDatabase
     from nextcord.ext import commands
     import nextcord
     import os
