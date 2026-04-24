@@ -104,6 +104,10 @@ class BotDatabase:
             conn.commit()
 
     def can_use_tokens(self, user_id: int, tokens_needed: int, default_limit: int) -> bool:
+        used_today, limit = self.get_tokens(user_id, default_limit)
+        return (used_today + tokens_needed) <= limit
+
+    def get_tokens(self, user_id: int, default_limit: int) -> tuple[int, int]:
         today = str(datetime.date.today())
 
         with sqlite3.connect(self.db_path) as conn:
@@ -118,8 +122,7 @@ class BotDatabase:
                 used_today, custom_limit = row
 
             limit = custom_limit if custom_limit is not None else default_limit
-
-            return (used_today + tokens_needed) <= limit
+            return used_today, limit
 
     def get_token_usage_history(self, user_id: int, days_back: int) -> int:
         date_limit = str(datetime.date.today() - datetime.timedelta(days=days_back))
