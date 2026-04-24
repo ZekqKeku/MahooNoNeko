@@ -1,0 +1,11 @@
+services:
+  mahoononeko:
+    build: .
+    container_name: mahoononeko
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/app/config.json
+      - ./data:/app/data
+      - ./downloads:/app/downloads
+    environment:
+      - TZ=Europe/Warsaw

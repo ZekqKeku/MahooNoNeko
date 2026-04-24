@@ -95,7 +95,6 @@ class Downloader(commands.Cog):
         self.downloader.remove_file(path)
 
         now = datetime.now()
-        deletion_time = now + timedelta(days=self.config.get_pixeldrain_delete_after())
         self.database.add_download(
             now.strftime('%Y-%m-%d %H:%M:%S'),
             interaction.user.id,
@@ -103,8 +102,7 @@ class Downloader(commands.Cog):
             file_name,
             ext,
             duration,
-            now.timestamp(),
-            deletion_time.timestamp()
+            now.timestamp()
         )
 
         self.database.add_tokens(interaction.user.id, cost)
@@ -187,7 +185,6 @@ class Downloader(commands.Cog):
         self.downloader.remove_file(path)
 
         now = datetime.now()
-        deletion_time = now + timedelta(days=self.config.get_pixeldrain_delete_after())
         self.database.add_download(
             now.strftime('%Y-%m-%d %H:%M:%S'),
             interaction.user.id,
@@ -195,8 +192,7 @@ class Downloader(commands.Cog):
             file_name,
             ext,
             duration,
-            now.timestamp(),
-            deletion_time.timestamp()
+            now.timestamp()
         )
 
         self.database.add_tokens(interaction.user.id, cost)

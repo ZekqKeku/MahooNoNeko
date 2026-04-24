@@ -46,21 +46,3 @@ class PixeldrainUploader:
 
     def get_download_link(self, file_id: str) -> str:
         return f"https://pixeldrain.com/u/{file_id}"
-
-    def get_file_info(self, file_id: str) -> dict:
-        print(f"Fetching info for file ID: {file_id}...")
-        url = f"{self.BASE_URL}/file/{file_id}/info"
-        response = requests.get(url, auth=self.auth)
-        response.raise_for_status()
-        return response.json()
-
-    def check_file_exists(self, file_id: str) -> bool:
-        try:
-            url = f"{self.BASE_URL}/file/{file_id}/info"
-            response = requests.get(url, auth=self.auth)
-            if response.status_code == 404:
-                return False
-            response.raise_for_status()
-            return True
-        except requests.RequestException:
-            return False

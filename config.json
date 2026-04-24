@@ -11,7 +11,6 @@
     "pixeldrain": {
       "key": "",
       "direct_link": false,
-      "delete_after": 3,
       "max_file_size": 2,
       "max_file_length": 5400,
       "default_token_limit": 350

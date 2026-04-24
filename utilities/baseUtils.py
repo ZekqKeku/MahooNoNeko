@@ -46,9 +46,6 @@ class ConfigReader:
     def get_pixeldrain_direct_link(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("direct_link", "")
 
-    def get_pixeldrain_delete_after(self):
-        return self.config_data.get("api", {}).get("pixeldrain", {}).get("delete_after", "")
-
     def get_pixeldrain_max_file_size(self):
         return self.config_data.get("api", {}).get("pixeldrain", {}).get("max_file_size", "")
 
