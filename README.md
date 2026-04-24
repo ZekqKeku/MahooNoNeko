@@ -14,14 +14,26 @@ Links are provided to the user, and the bot records every download in a built-in
 
 ## 🪙 Token System (Quota)
 
-To prevent abuse and manage server resources, the bot implements a daily token-based quota system for users. Each user receives a daily allowance of tokens (defined by `default_token_limit`), which resets every day at midnight. 
+To prevent abuse and manage server resources, the bot implements a daily token-based quota system. Each user receives a daily allowance of tokens (defined by `default_token_limit`), which resets every day at midnight.
 
-The cost of each download is calculated dynamically before the download begins:
-* **Base cost**: 10 points per operation
-* **Duration**: 2 points per every minute of the media
-* **Quality/Format multiplier**: Additional points are added for higher resolutions (e.g., 1440p costs +100 points, 4K costs +150 points) or lossless audio formats.
+### 🧮 Cost Calculation Formula
 
-If an operation exceeds the user's remaining daily tokens, the download request will be rejected.
+The cost of each operation is calculated as follows:
+
+$$TotalCost = B + (\lceil \frac{D}{60} \rceil \times M) + J$$
+
+**Where:**
+*   **$B$ (Base Cost)**: **10 tokens** (fixed cost for every download operation).
+*   **$D$ (Duration)**: Duration of the media in seconds.
+*   **$M$ (Minute Rate)**: **2 tokens** per every started minute of the media.
+*   **$J$ (Quality/Format Adjustment)**:
+    *   **Video**: 480p/720p/1080p: **+0**, 1440p (2K): **+100**, 2160p (4K): **+150**.
+    *   **Audio**: MP3/M4A: **+0**, WAV/FLAC: **+50**.
+
+**Example**: A 5-minute video (300s) in 1080p resolution would cost:  
+$10 + (\lceil \frac{300}{60} \rceil \times 2) + 0 = 10 + 10 = \mathbf{20\ tokens}$.
+
+If an operation exceeds the user's remaining daily tokens, the request will be rejected. Super users defined in the configuration are exempt from these limits.
 
 ## 🛠️ Prerequisites
 

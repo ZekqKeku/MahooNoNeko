@@ -42,7 +42,7 @@ class Downloader(commands.Cog):
 
     @nextcord.slash_command(
         name="download_music",
-        description="Download a mp3 file",
+        description="Download an audio file",
     )
     @cog_cooldown(message="**Cooldown!** Next download possible in **&value&s**.")
     async def download_music(self,
@@ -50,6 +50,18 @@ class Downloader(commands.Cog):
         url: str = nextcord.SlashOption(
         name="url",
         description="The URL to the youtube video, instagram reels, etc.",
+        ),
+        audio_format: str = nextcord.SlashOption(
+        name="format",
+        description="The audio format to download",
+        required=False,
+        default="mp3",
+        choices={
+            "MP3 (Compressed)": "mp3",
+            "M4A (Apple/High quality)": "m4a",
+            "WAV (Lossless/Heavy)": "wav",
+            "FLAC (Lossless/High fidelity)": "flac"
+        }
     )):
         await interaction.response.defer(ephemeral=True)
 
@@ -60,7 +72,7 @@ class Downloader(commands.Cog):
             url=url,
             max_length=max_length,
             max_size_gb=max_size_gb,
-            audio_format="mp3",
+            audio_format=audio_format,
             is_audio=True
         )
 
@@ -78,9 +90,9 @@ class Downloader(commands.Cog):
                 return
 
         file_name = baseUtils.Utils.random_name()
-        ext = "mp3"
+        ext = audio_format
 
-        dl_result = self.downloader.download_audio(url, file_name)
+        dl_result = await self.downloader.download_audio(url, file_name, ext=ext)
 
         if not dl_result or (isinstance(dl_result, dict) and not dl_result.get('success')):
             await interaction.followup.send(
@@ -108,7 +120,7 @@ class Downloader(commands.Cog):
         self.database.add_tokens(interaction.user.id, cost)
 
         content = (
-            f"**Success.** Below is the download link for your .mp3 file.\n"
+            f"**Success.** Below is the download link for your .{ext} file.\n"
             f"Operation cost: **{cost} points**\n\n"
             f"{file_url}"
         )
