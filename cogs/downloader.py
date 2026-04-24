@@ -80,9 +80,9 @@ class Downloader(commands.Cog):
             await self._handle_media_error(interaction, media_info)
             return
 
+        cost = media_info["cost"]
         is_super_user = interaction.user.id in [int(u) for u in self.config.get_super_users() if str(u).isdigit()]
         if not is_super_user:
-            cost = media_info["cost"]
             if not self.database.can_use_tokens(interaction.user.id, cost, self.token_limit):
                 await interaction.followup.send(
                     f"**Insufficient tokens.** This operation costs **{cost} points**, which would exceed your daily limit.",
@@ -167,9 +167,9 @@ class Downloader(commands.Cog):
             await self._handle_media_error(interaction, media_info)
             return
 
+        cost = media_info["cost"]
         is_super_user = interaction.user.id in [int(u) for u in self.config.get_super_users() if str(u).isdigit()]
         if not is_super_user:
-            cost = media_info["cost"]
             if not self.database.can_use_tokens(interaction.user.id, cost, self.token_limit):
                 await interaction.followup.send(
                     f"**Insufficient tokens.** This operation costs **{cost} points**, which would exceed your daily limit.",
